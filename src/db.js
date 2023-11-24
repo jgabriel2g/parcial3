@@ -10,9 +10,11 @@ export const pool = createPool({
     port: DB_PORT
 });
 
-//try {
-    //let sql = fs.readFileSync('src/db/user.sql', 'utf8');
-    //await pool.query(sql)
-//} catch (err) {
-  //  console.error('Error al ejecutar comandos SQL:', err);
-//}
+try {
+    let sql = fs.readFileSync('src/db/user.sql', 'utf8');
+    await pool.query(sql)
+    sql = fs.readFileSync('src/db/product.sql', 'utf8');
+    await pool.query(sql)
+} catch (err) {
+    console.error('Error al ejecutar comandos SQL:', err);
+}
