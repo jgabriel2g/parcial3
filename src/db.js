@@ -15,6 +15,8 @@ try {
     await pool.query(sql)
     sql = fs.readFileSync('src/db/product.sql', 'utf8');
     await pool.query(sql)
+    sql = fs.readFileSync('src/db/sale.sql', 'utf8');
+    await pool.query(sql)
 } catch (err) {
     console.error('Error al ejecutar comandos SQL:', err);
 }
