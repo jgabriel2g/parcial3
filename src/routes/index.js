@@ -47,7 +47,14 @@ router.post('/api/login', async (req, res) => {
                 const token = jwt.sign({ username }, 'secretkey', { expiresIn: '1h' });
 
                 res.cookie('token', token, { httpOnly: true });
-                res.status(200).send({ message: 'Inicio de sesión exitoso', token, rol: result[0].rol });
+                res.status(200).send({
+                    message: 'Inicio de sesión exitoso',
+                    token,
+                    data: {
+                        role: result[0].rol,
+                        name: result[0].username,
+                    },
+                });
             } else {
                 res.status(401).send({ message: 'Credenciales incorrectas' });
             }
