@@ -78,7 +78,7 @@ router.post('/api/refresh', (req, res) => {
         return res.status(403).json({ message: 'No se proporcionó un token de actualización' });
     }
 
-    jwt.verify(refreshToken, 'refreshkey', (err, user) => {
+    jwt.verify(refreshToken, 'secretkey', (err, user) => {
         if (err) {
             return res.status(403).json({ message: 'Token de actualización inválido' });
         }
