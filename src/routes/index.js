@@ -44,12 +44,16 @@ router.post('/api/login', async (req, res) => {
             const match = bcrypt.compare(password, result[0].password);
 
             if (match) {
-                const token = jwt.sign({ username }, 'secretkey', { expiresIn: '1h' });
+                const accessToken = jwt.sign({ username }, 'secretkey', { expiresIn: '2h' });
+                const refreshToken = jwt.sign({ username }, 'secretKey', { expiresIn: '7d' });
 
-                res.cookie('token', token, { httpOnly: true });
+                res.cookie('token', accessToken, { httpOnly: true });
+                res.cookie('refreshToken', refreshToken, { httpOnly: true, expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) });
+
                 res.status(200).send({
                     message: 'Inicio de sesión exitoso',
-                    token,
+                    accessToken,
+                    refreshToken,
                     data: {
                         role: result[0].rol,
                         name: result[0].username,
@@ -65,6 +69,23 @@ router.post('/api/login', async (req, res) => {
             message: "Something goes wrong" + error
         })
     }
+});
+
+router.post('/api/refresh', (req, res) => {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+        return res.status(403).json({ message: 'No se proporcionó un token de actualización' });
+    }
+
+    jwt.verify(refreshToken, 'refreshkey', (err, user) => {
+        if (err) {
+            return res.status(403).json({ message: 'Token de actualización inválido' });
+        }
+
+        const accessToken = jwt.sign({ username: user.username }, 'secretkey', { expiresIn: '1h' });
+        res.status(200).json({ accessToken });
+    });
 });
 
 export default router
