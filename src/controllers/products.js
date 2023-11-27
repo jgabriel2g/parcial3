@@ -68,7 +68,7 @@ export const deleteProductById = async (req, res) => {
             message: "Product not found"
         })
 
-        res.sendStatus(404)
+        res.sendStatus(204)
     } catch (error) {
         return res.status(500).json({
             message: "Something goes wrong" + error
