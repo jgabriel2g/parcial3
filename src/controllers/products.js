@@ -2,7 +2,7 @@ import { pool } from "../db.js";
 
 export const createProduct = async (req, res) => {
     try {
-        const {name, description, price, amount} = req.body
+        const {name, description, price, stock} = req.body
         if (!name) {
             res.status(400).send("Name is required");
             return;
@@ -17,13 +17,13 @@ export const createProduct = async (req, res) => {
             return;
         }
         const query = "insert into products (name, description, price, stock) values (?,?,?,?)"
-        const [rows] = await pool.query(query, [name, description, price, amount])
+        const [rows] = await pool.query(query, [name, description, price, stock])
         res.send({
             id: rows.insertId,
             name: name,
             description: description,
             price: price,
-            amount: amount
+            stock: stock
         })
     } catch (error) {
         return res.status(500).json({
@@ -71,7 +71,7 @@ export const deleteProductById = async (req, res) => {
         res.sendStatus(404)
     } catch (error) {
         return res.status(500).json({
-            message: "Something goes wrong"
+            message: "Something goes wrong" + error
         })
     }
 }
@@ -79,10 +79,10 @@ export const deleteProductById = async (req, res) => {
 export const updateProduct = async (req, res) => {
     try{
         const {id} = req.params
-        const {name, description, price, amount} = req.body
-        const query = "update products set name = ifnull(?, name), description = ifnull(?, description), price = ifnull(?, price), amount = ifnull(?, amount) where id = ?;"
+        const {name, description, price, stock} = req.body
+        const query = "update products set name = ifnull(?, name), description = ifnull(?, description), price = ifnull(?, price), stock = ifnull(?, stock) where id = ?;"
 
-        const [result] = await pool.query(query, [name, description, price, amount, id])
+        const [result] = await pool.query(query, [name, description, price, stock, id])
 
         if (result.affectedRows === 0) return res.status(404).json({
             message: "Product not found"
