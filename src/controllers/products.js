@@ -64,7 +64,7 @@ export const deleteProductById = async (req, res) => {
         const {id} = req.params
         const [result] = await pool.query('delete from products where id = ?', [id])
 
-        if (result.affectedRows <= 0) return res.status(404).json({
+        if (result.changedRows === 0) return res.status(404).json({
             message: "Product not found"
         })
 
