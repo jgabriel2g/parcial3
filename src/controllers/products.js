@@ -16,7 +16,7 @@ export const createProduct = async (req, res) => {
             res.status(400).send("Amount is required");
             return;
         }
-        const query = "insert into products (name, description, price, amount) values (?,?,?,?)"
+        const query = "insert into products (name, description, price, stock) values (?,?,?,?)"
         const [rows] = await pool.query(query, [name, description, price, amount])
         res.send({
             id: rows.insertId,
@@ -27,7 +27,7 @@ export const createProduct = async (req, res) => {
         })
     } catch (error) {
         return res.status(500).json({
-            message: "Something goes wrong"
+            message: "Something goes wrong, "+ error
         })
     }
 }
