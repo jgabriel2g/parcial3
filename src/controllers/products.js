@@ -12,8 +12,8 @@ export const createProduct = async (req, res) => {
             res.status(400).send("Price is required");
             return;
         }
-        if (!amount && amount !== 0) {
-            res.status(400).send("Amount is required");
+        if (!stock && stock !== 0) {
+            res.status(400).send("stock is required");
             return;
         }
         const query = "insert into products (name, description, price, stock) values (?,?,?,?)"
@@ -64,7 +64,7 @@ export const deleteProductById = async (req, res) => {
         const {id} = req.params
         const [result] = await pool.query('delete from products where id = ?', [id])
 
-        if (result.changedRows === 0) return res.status(404).json({
+        if (result.affectedRows <= 0) return res.status(404).json({
             message: "Product not found"
         })
 
