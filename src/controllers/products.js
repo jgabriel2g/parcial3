@@ -2,6 +2,7 @@ import { pool } from "../db.js";
 import jwt from "jsonwebtoken";
 
 const validateHeaders = (req, res) => {
+    const headers = req.headers
     if (!headers["authorization"]) {
         res.status(401).send({ message: 'Acceso no autorizado' });
     } else {
@@ -53,7 +54,6 @@ export const createProduct = async (req, res) => {
 
 export const getProducts = async (req, res) => {
     try {
-        validateHeaders(req, res)
         const [rows] = await pool.query('select * from products;')
         res.json(rows)
     } catch (error) {
@@ -67,7 +67,6 @@ export const getProducts = async (req, res) => {
 
 export const getProductById = async (req, res) => {
     try {
-        validateHeaders(req, res)
         const {id} = req.params
         const [rows] = await pool.query('select * from products where id = ?;', [id])
 

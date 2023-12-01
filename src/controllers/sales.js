@@ -2,6 +2,7 @@ import { pool } from "../db.js";
 import jwt from "jsonwebtoken";
 
 const validateHeaders = (req, res) => {
+    const headers = req.headers
     if (!headers["authorization"]) {
         res.status(401).send({ message: 'Acceso no autorizado' });
     } else {
@@ -10,7 +11,7 @@ const validateHeaders = (req, res) => {
             if (err) {
                 res.status(401).send({ message: 'Token inválido' });
             } else {
-                if (decoded["rol"] !== "ADMIN"){
+                if (decoded["rol"] !== "ADVISER"){
                     res.status(401).send({ message: 'Acceso no autorizado' });
                 }
             }
