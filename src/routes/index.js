@@ -44,7 +44,7 @@ router.post('/api/login', async (req, res) => {
             const match = bcrypt.compare(password, result[0].password);
 
             if (match) {
-                const accessToken = jwt.sign({ username }, 'secretkey', { expiresIn: '2h' });
+                const accessToken = jwt.sign({ username, rol: result[0].rol }, 'secretkey', { expiresIn: '2h' });
                 const refreshToken = jwt.sign({ username }, 'secretKey', { expiresIn: '7d' });
 
                 res.cookie('token', accessToken, { httpOnly: true });

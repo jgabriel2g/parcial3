@@ -1,7 +1,26 @@
 import { pool } from "../db.js";
+import jwt from "jsonwebtoken";
+
+const validateHeaders = (req, res) => {
+    if (!headers["authorization"]) {
+        res.status(401).send({ message: 'Acceso no autorizado' });
+    } else {
+        const token = headers["authorization"].split(" ")[1]
+        jwt.verify(token, 'secretkey', (err, decoded) => {
+            if (err) {
+                res.status(401).send({ message: 'Token inválido' });
+            } else {
+                if (decoded["rol"] !== "ADMIN"){
+                    res.status(401).send({ message: 'Acceso no autorizado' });
+                }
+            }
+        });
+    }
+}
 
 export const createSale = async (req, res) => {
     try {
+        validateHeaders(req, res)
         const {product_id, client_name, client_phone, amount, price} = req.body
         if (!product_id && product_id !== 0) {
             res.status(400).send("product_id is required");
@@ -56,6 +75,7 @@ export const createSale = async (req, res) => {
 
 export const getSales = async (req, res) => {
     try {
+        validateHeaders(req, res)
         const [rows] = await pool.query('select * from sales;')
         res.json(rows)
     }catch (error) {
@@ -67,6 +87,7 @@ export const getSales = async (req, res) => {
 
 export const getSalesById = async (req, res) => {
     try {
+        validateHeaders(req, res)
         const {id} = req.params
         const [rows] = await pool.query('select * from sales where id = ?;', [id])
         if (rows.length <= 0) return res.status(404).json({
@@ -82,6 +103,7 @@ export const getSalesById = async (req, res) => {
 
 export const deleteSaleById = async (req, res) => {
     try{
+        validateHeaders(req, res)
         const {id} = req.params
         const [result] = await pool.query('delete from sales where id = ?', [id])
         if (result.affectedRows <= 0) return res.status(404).json({
@@ -98,6 +120,7 @@ export const deleteSaleById = async (req, res) => {
 
 export const updateSale = async (req, res) => {
     try {
+        validateHeaders(req, res)
         const {id} = req.params
         const {product_id, client_name, client_phone, amount, price} = req.body
         const query = "update sales set product_id = ifnull(?, product_id), client_name = ifnull(?, client_name), client_phone = ifnull(?, client_phone), amount = ifnull(?, amount), price = ifnull(?, price) where id = ?"

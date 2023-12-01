@@ -1,7 +1,26 @@
 import { pool } from "../db.js";
+import jwt from "jsonwebtoken";
+
+const validateHeaders = (req, res) => {
+    if (!headers["authorization"]) {
+        res.status(401).send({ message: 'Acceso no autorizado' });
+    } else {
+        const token = headers["authorization"].split(" ")[1]
+        jwt.verify(token, 'secretkey', (err, decoded) => {
+            if (err) {
+                res.status(401).send({ message: 'Token inválido' });
+            } else {
+                if (decoded["rol"] !== "ADMIN"){
+                    res.status(401).send({ message: 'Acceso no autorizado' });
+                }
+            }
+        });
+    }
+}
 
 export const createProduct = async (req, res) => {
     try {
+        validateHeaders(req, res)
         const {name, description, price, stock} = req.body
         if (!name) {
             res.status(400).send("Name is required");
@@ -34,6 +53,7 @@ export const createProduct = async (req, res) => {
 
 export const getProducts = async (req, res) => {
     try {
+        validateHeaders(req, res)
         const [rows] = await pool.query('select * from products;')
         res.json(rows)
     } catch (error) {
@@ -42,9 +62,12 @@ export const getProducts = async (req, res) => {
         })
     }
 }
+/*
+* */
 
 export const getProductById = async (req, res) => {
     try {
+        validateHeaders(req, res)
         const {id} = req.params
         const [rows] = await pool.query('select * from products where id = ?;', [id])
 
@@ -61,6 +84,7 @@ export const getProductById = async (req, res) => {
 
 export const deleteProductById = async (req, res) => {
     try{
+        validateHeaders(req, res)
         const {id} = req.params
         const [result] = await pool.query('delete from products where id = ?', [id])
 
@@ -78,6 +102,7 @@ export const deleteProductById = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
     try{
+        validateHeaders(req, res)
         const {id} = req.params
         const {name, description, price, stock} = req.body
         const query = "update products set name = ifnull(?, name), description = ifnull(?, description), price = ifnull(?, price), stock = ifnull(?, stock) where id = ?;"
